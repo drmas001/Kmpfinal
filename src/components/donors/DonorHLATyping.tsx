@@ -5,6 +5,7 @@ import {
   FormLabel,
   FormControl,
   FormMessage,
+  FormDescription,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 
@@ -22,8 +23,11 @@ export function DonorHLATyping() {
             <FormItem>
               <FormLabel>HLA-A</FormLabel>
               <FormControl>
-                <Input placeholder="Enter HLA-A typing" {...field} />
+                <Input placeholder="e.g., A1, A2, A24" {...field} />
               </FormControl>
+              <FormDescription>
+                Enter multiple alleles separated by commas
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -36,8 +40,11 @@ export function DonorHLATyping() {
             <FormItem>
               <FormLabel>HLA-B</FormLabel>
               <FormControl>
-                <Input placeholder="Enter HLA-B typing" {...field} />
+                <Input placeholder="e.g., B7, B8, B27" {...field} />
               </FormControl>
+              <FormDescription>
+                Enter multiple alleles separated by commas
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -50,8 +57,11 @@ export function DonorHLATyping() {
             <FormItem>
               <FormLabel>HLA-C</FormLabel>
               <FormControl>
-                <Input placeholder="Enter HLA-C typing" {...field} />
+                <Input placeholder="e.g., Cw1, Cw2, Cw4" {...field} />
               </FormControl>
+              <FormDescription>
+                Enter multiple alleles separated by commas
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -64,8 +74,11 @@ export function DonorHLATyping() {
             <FormItem>
               <FormLabel>HLA-DR</FormLabel>
               <FormControl>
-                <Input placeholder="Enter HLA-DR typing" {...field} />
+                <Input placeholder="e.g., DR1, DR4, DR7" {...field} />
               </FormControl>
+              <FormDescription>
+                Enter multiple alleles separated by commas
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -78,8 +91,11 @@ export function DonorHLATyping() {
             <FormItem>
               <FormLabel>HLA-DQ</FormLabel>
               <FormControl>
-                <Input placeholder="Enter HLA-DQ typing" {...field} />
+                <Input placeholder="e.g., DQ2, DQ4, DQ8" {...field} />
               </FormControl>
+              <FormDescription>
+                Enter multiple alleles separated by commas
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -92,8 +108,11 @@ export function DonorHLATyping() {
             <FormItem>
               <FormLabel>HLA-DP</FormLabel>
               <FormControl>
-                <Input placeholder="Enter HLA-DP typing" {...field} />
+                <Input placeholder="e.g., DP1, DP2, DP4" {...field} />
               </FormControl>
+              <FormDescription>
+                Enter multiple alleles separated by commas
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}

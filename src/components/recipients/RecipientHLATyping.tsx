@@ -4,6 +4,7 @@ import {
   FormLabel,
   FormControl,
   FormMessage,
+  FormDescription,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -31,8 +32,11 @@ export function RecipientHLATyping() {
             <FormItem>
               <FormLabel>HLA-A Typing</FormLabel>
               <FormControl>
-                <Input placeholder="e.g., A1, A3" {...field} />
+                <Input placeholder="e.g., A1, A2, A24" {...field} />
               </FormControl>
+              <FormDescription>
+                Enter multiple alleles separated by commas
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -44,8 +48,11 @@ export function RecipientHLATyping() {
             <FormItem>
               <FormLabel>HLA-B Typing</FormLabel>
               <FormControl>
-                <Input placeholder="e.g., B8, B44" {...field} />
+                <Input placeholder="e.g., B7, B8, B27" {...field} />
               </FormControl>
+              <FormDescription>
+                Enter multiple alleles separated by commas
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -57,8 +64,11 @@ export function RecipientHLATyping() {
             <FormItem>
               <FormLabel>HLA-C Typing</FormLabel>
               <FormControl>
-                <Input placeholder="e.g., Cw5, Cw7" {...field} />
+                <Input placeholder="e.g., Cw1, Cw2, Cw4" {...field} />
               </FormControl>
+              <FormDescription>
+                Enter multiple alleles separated by commas
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -70,8 +80,11 @@ export function RecipientHLATyping() {
             <FormItem>
               <FormLabel>HLA-DR Typing</FormLabel>
               <FormControl>
-                <Input placeholder="e.g., DR4, DR17" {...field} />
+                <Input placeholder="e.g., DR1, DR4, DR7" {...field} />
               </FormControl>
+              <FormDescription>
+                Enter multiple alleles separated by commas
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -83,8 +96,11 @@ export function RecipientHLATyping() {
             <FormItem>
               <FormLabel>HLA-DQ Typing</FormLabel>
               <FormControl>
-                <Input placeholder="e.g., DQ2, DQ8" {...field} />
+                <Input placeholder="e.g., DQ2, DQ4, DQ8" {...field} />
               </FormControl>
+              <FormDescription>
+                Enter multiple alleles separated by commas
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -96,8 +112,11 @@ export function RecipientHLATyping() {
             <FormItem>
               <FormLabel>HLA-DP Typing</FormLabel>
               <FormControl>
-                <Input placeholder="e.g., DP1, DP2" {...field} />
+                <Input placeholder="e.g., DP1, DP2, DP4" {...field} />
               </FormControl>
+              <FormDescription>
+                Enter multiple alleles separated by commas
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
