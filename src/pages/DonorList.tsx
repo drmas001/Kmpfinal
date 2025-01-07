@@ -9,29 +9,11 @@ import { getDonors, deleteDonor } from '@/lib/api/donors';
 import type { Donor } from '@/types/matching';
 import { toast } from 'sonner';
 
-interface DonorData {
-  id: string;
-  created_at: string;
-  mrn: string;
-  national_id: string;
-  name: string;
-  blood_type: string;
-  hla_typing?: {
-    hla_a?: string;
-    hla_b?: string;
-    hla_c?: string;
-    hla_dr?: string;
-    hla_dq?: string;
-    hla_dp?: string;
-  };
-  // Add other fields as needed
-}
-
 export function DonorList() {
   const navigate = useNavigate();
   const [donors, setDonors] = useState<Donor[]>([]);
   const [filteredDonors, setFilteredDonors] = useState<Donor[]>([]);
-  const [selectedDonor, setSelectedDonor] = useState<DonorData | null>(null);
+  const [selectedDonor, setSelectedDonor] = useState<Donor | null>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -60,7 +42,7 @@ export function DonorList() {
       const searchTerm = query.toLowerCase();
       filtered = filtered.filter(
         (donor) =>
-          donor.fullName.toLowerCase().includes(searchTerm) ||
+          donor.full_name.toLowerCase().includes(searchTerm) ||
           donor.mrn.toLowerCase().includes(searchTerm)
       );
     }
@@ -68,7 +50,7 @@ export function DonorList() {
     // Apply blood type filter
     if (filters.bloodType) {
       filtered = filtered.filter(
-        (donor) => donor.bloodType === filters.bloodType
+        (donor) => donor.blood_type === filters.bloodType
       );
     }
 

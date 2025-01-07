@@ -1,3 +1,5 @@
+import type { Database } from './supabase';
+
 export type BloodType = 'O-' | 'O+' | 'A-' | 'A+' | 'B-' | 'B+' | 'AB-' | 'AB+';
 
 export type HLAType = string;
@@ -11,33 +13,8 @@ export interface HLATyping {
   hla_dp?: string;
 }
 
-export interface DSAResult {
-  detected: boolean;
-  mfi?: number;
-}
-
-export interface Recipient {
-  id: string;
-  created_at: string;
-  mrn: string;
-  national_id: string;
-  fullName: string;
-  bloodType: string;
-  status: string;
-  hla_typing?: HLATyping;
-  unacceptable_antigens?: string;
-}
-
-export interface Donor {
-  id: string;
-  created_at: string;
-  mrn: string;
-  national_id: string;
-  fullName: string;
-  bloodType: string;
-  status: string;
-  hla_typing?: HLATyping;
-}
+export type Donor = Database['public']['Tables']['donors']['Row'];
+export type Recipient = Database['public']['Tables']['recipients']['Row'];
 
 export interface MatchingResult {
   donor: Donor;

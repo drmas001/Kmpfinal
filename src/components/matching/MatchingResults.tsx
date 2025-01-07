@@ -1,10 +1,7 @@
-import type { Database } from '@/types/supabase';
+import type { Donor, Recipient } from '@/types/matching';
 import { Badge } from '@/components/ui/badge';
 import { getHLAMatchGrade } from '@/utils/matching';
 import { MatchInfoCard } from './MatchInfoCard';
-
-type Donor = Database['public']['Tables']['donors']['Row'];
-type Recipient = Database['public']['Tables']['recipients']['Row'];
 
 function getMatchGradeVariant(grade: string) {
   switch (grade) {
