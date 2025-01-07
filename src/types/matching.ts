@@ -1,12 +1,14 @@
 export type BloodType = 'O-' | 'O+' | 'A-' | 'A+' | 'B-' | 'B+' | 'AB-' | 'AB+';
 
+export type HLAType = string;
+
 export interface HLATyping {
-  hlaA: string;
-  hlaB: string;
-  hlaC: string;
-  hlaDR: string;
-  hlaDQ: string;
-  hlaDP: string;
+  hla_a?: string;
+  hla_b?: string;
+  hla_c?: string;
+  hla_dr?: string;
+  hla_dq?: string;
+  hla_dp?: string;
 }
 
 export interface DSAResult {
@@ -16,48 +18,25 @@ export interface DSAResult {
 
 export interface Recipient {
   id: string;
+  created_at: string;
   mrn: string;
-  nationalId: string;
+  national_id: string;
   fullName: string;
-  age: number;
   bloodType: string;
-  mobileNumber: string;
-  hlaTyping: HLATyping;
-  pra: number;
-  crossmatchRequirement: string;
-  viralScreening: string;
-  cmvStatus: string;
-  unacceptableAntigens: string;
-  donorAntibodies: string;
-  medicalHistory: string;
-  notes: string;
-  serumCreatinine: number;
-  egfr: number;
-  bloodPressure: string;
+  status: string;
+  hla_typing?: HLATyping;
+  unacceptable_antigens?: string;
 }
 
 export interface Donor {
   id: string;
+  created_at: string;
   mrn: string;
-  nationalId: string;
+  national_id: string;
   fullName: string;
-  age: number;
   bloodType: string;
-  mobileNumber: string;
-  hlaTyping: HLATyping;
-  crossmatchResult: string;
-  donorAntibodies: string;
-  serumCreatinine: number;
-  egfr: number;
-  bloodPressure: string;
-  viralScreening: string;
-  cmvStatus: string;
-  medicalConditions: string;
-  notes: string;
-  highResTyping: string;
-  antigenMismatch: number;
-  dsaResult: DSAResult;
-  status: 'Available' | 'Utilized';
+  status: string;
+  hla_typing?: HLATyping;
 }
 
 export interface MatchingResult {

@@ -1,21 +1,22 @@
 import type { Database } from '@/types/supabase';
 import { Badge } from '@/components/ui/badge';
+import { getHLAMatchGrade } from '@/utils/matching';
+import { MatchInfoCard } from './MatchInfoCard';
 
 type Donor = Database['public']['Tables']['donors']['Row'];
 type Recipient = Database['public']['Tables']['recipients']['Row'];
 
-interface MatchingResultsProps {
-  donor: Donor;
-  recipient: Recipient;
-  isMatch: boolean;
-  exclusionReason?: string;
-  hlaMatches?: {
-    [key: string]: {
-      donorAlleles: string[];
-      recipientAlleles: string[];
-      matchedAlleles: string[];
-    };
-  };
+function getMatchGradeVariant(grade: string) {
+  switch (grade) {
+    case 'A':
+      return 'success';
+    case 'B':
+      return 'warning';
+    case 'C':
+      return 'secondary';
+    default:
+      return 'destructive';
+  }
 }
 
 export function MatchingResults({ donor, recipient, matchScore }: {
