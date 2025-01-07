@@ -1,14 +1,15 @@
-import { BloodType } from '@/types/matching';
+export type BloodType = 'A+' | 'A-' | 'B+' | 'B-' | 'AB+' | 'AB-' | 'O+' | 'O-';
 
-const BLOOD_TYPE_COMPATIBILITY: Record<BloodType, BloodType[]> = {
+// Blood type compatibility matrix
+export const BLOOD_TYPE_COMPATIBILITY: Record<BloodType, readonly BloodType[]> = {
   'O-': ['O-'],
-  'O+': ['O-','O+', 'A+', 'B+', 'AB+'],
-  'A-': ['A-', 'A+', 'AB-', 'AB+'],
-  'A+': ['A+', 'AB+'],
-  'B-': ['B-', 'B+', 'AB-', 'AB+'],
-  'B+': ['B+', 'AB+'],
-  'AB-': ['AB-', 'AB+'],
-  'AB+': ['AB+'],
+  'O+': ['O-', 'O+'],
+  'A-': ['O-', 'A-'],
+  'A+': ['O-', 'O+', 'A-', 'A+'],
+  'B-': ['O-', 'B-'],
+  'B+': ['O-', 'O+', 'B-', 'B+'],
+  'AB-': ['O-', 'A-', 'B-', 'AB-'],
+  'AB+': ['O-', 'O+', 'A-', 'A+', 'B-', 'B+', 'AB-', 'AB+']
 } as const;
 
 export function isBloodTypeCompatible(
