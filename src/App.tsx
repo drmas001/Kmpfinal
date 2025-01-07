@@ -23,11 +23,11 @@ export default function App() {
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
-        <Route path="/learn-more" element={<LearnMore />} />
         
         {/* Protected Routes */}
         <Route element={<RequireAuth><Layout /></RequireAuth>}>
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/learn-more" element={<LearnMore />} />
           <Route path="/donors">
             <Route index element={<DonorList />} />
             <Route path="new" element={<DonorForm />} />

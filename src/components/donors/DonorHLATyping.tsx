@@ -7,6 +7,13 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 export function DonorHLATyping() {
   const { control } = useFormContext();
@@ -15,6 +22,28 @@ export function DonorHLATyping() {
     <div className="space-y-6">
       <h2 className="text-lg font-medium">HLA Typing Information</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <FormField
+          control={control}
+          name="crossmatchResult"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Crossmatch Result</FormLabel>
+              <Select onValueChange={field.onChange} value={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select result" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="Positive">Positive</SelectItem>
+                  <SelectItem value="Negative">Negative</SelectItem>
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
         <FormField
           control={control}
           name="hlaA"

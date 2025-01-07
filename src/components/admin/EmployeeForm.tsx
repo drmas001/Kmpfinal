@@ -30,7 +30,8 @@ export function EmployeeForm({ onSubmit }: EmployeeFormProps) {
     resolver: zodResolver(employeeSchema),
     defaultValues: {
       fullName: '',
-      employeeCode: '',
+      email: '',
+      password: '',
       role: undefined,
     },
   });
@@ -87,12 +88,26 @@ export function EmployeeForm({ onSubmit }: EmployeeFormProps) {
 
           <FormField
             control={form.control}
-            name="employeeCode"
+            name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Employee Code</FormLabel>
+                <FormLabel>Email</FormLabel>
                 <FormControl>
-                  <Input placeholder="Enter unique employee code" {...field} />
+                  <Input type="email" placeholder="Enter email address" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Password</FormLabel>
+                <FormControl>
+                  <Input type="password" placeholder="Enter password" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>

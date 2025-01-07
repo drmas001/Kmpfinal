@@ -44,6 +44,7 @@
     "clsx": "^2.1.1",
     "cmdk": "^1.0.0",
     "date-fns": "^3.6.0",
+    "dotenv": "^16.4.7",
     "embla-carousel-react": "^8.3.0",
     "input-otp": "^1.2.4",
     "jspdf": "^2.5.2",
@@ -66,6 +67,7 @@
   "devDependencies": {
     "@eslint/js": "^9.11.1",
     "@testing-library/jest-dom": "^6.6.3",
+    "@types/dotenv": "^8.2.3",
     "@types/jest": "^29.5.14",
     "@types/node": "^22.7.3",
     "@types/react": "^18.3.9",

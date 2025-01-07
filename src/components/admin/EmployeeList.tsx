@@ -41,7 +41,7 @@ export function EmployeeList({ employees, onDelete }: EmployeeListProps) {
           <TableRow>
             <TableHead>Employee Name</TableHead>
             <TableHead>Role</TableHead>
-            <TableHead>Employee Code</TableHead>
+            <TableHead>Email</TableHead>
             <TableHead>Created At</TableHead>
             <TableHead className="text-right">Actions</TableHead>
           </TableRow>
@@ -57,7 +57,7 @@ export function EmployeeList({ employees, onDelete }: EmployeeListProps) {
                   {employee.role}
                 </Badge>
               </TableCell>
-              <TableCell>{employee.employeeCode}</TableCell>
+              <TableCell>{employee.email}</TableCell>
               <TableCell>
                 {formatDate(employee.createdAt)}
               </TableCell>

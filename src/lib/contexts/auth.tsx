@@ -6,6 +6,7 @@ import {
   type ReactNode,
 } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { supabase } from '@/lib/supabase';
 import type { Employee } from '@/types/employee';
 
 interface AuthContextType {
@@ -27,28 +28,64 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const checkSession = async () => {
       try {
         setIsLoading(true);
-        const storedEmployee = sessionStorage.getItem('employee');
-        if (storedEmployee) {
-          setEmployee(JSON.parse(storedEmployee));
+        
+        // Get the current session
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (session?.user) {
+          // Get the employee data
+          const { data: employeeData, error } = await supabase
+            .from('employees')
+            .select('*')
+            .eq('id', session.user.id)
+            .single();
+
+          if (error) throw error;
+          
+          setEmployee(employeeData);
         }
       } catch (error) {
         console.error('Session check error:', error);
+        setEmployee(null);
       } finally {
         setIsLoading(false);
       }
     };
 
+    // Initial session check
     checkSession();
-  }, []);
+
+    // Subscribe to auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_IN' && session?.user) {
+        const { data: employeeData, error } = await supabase
+          .from('employees')
+          .select('*')
+          .eq('id', session.user.id)
+          .single();
+
+        if (!error) {
+          setEmployee(employeeData);
+        }
+      } else if (event === 'SIGNED_OUT') {
+        setEmployee(null);
+        navigate('/');
+      }
+    });
+
+    // Cleanup subscription
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [navigate]);
 
   const login = (employee: Employee) => {
     setEmployee(employee);
-    sessionStorage.setItem('employee', JSON.stringify(employee));
   };
 
-  const logout = () => {
+  const logout = async () => {
+    await supabase.auth.signOut();
     setEmployee(null);
-    sessionStorage.removeItem('employee');
     navigate('/');
   };
 

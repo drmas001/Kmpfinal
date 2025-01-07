@@ -12,8 +12,8 @@ CREATE TABLE public.employees (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     full_name VARCHAR(100) NOT NULL,
-    role VARCHAR(20) NOT NULL CHECK (role IN ('Doctor', 'Nurse', 'Administrator')),
-    employee_code VARCHAR(20) NOT NULL UNIQUE
+    email VARCHAR(255) NOT NULL UNIQUE,
+    role VARCHAR(20) NOT NULL CHECK (role IN ('Doctor', 'Nurse', 'Administrator'))
 );
 
 -- Create donors table
@@ -79,7 +79,7 @@ CREATE TABLE public.matching_results (
 
 -- Create indexes
 CREATE INDEX idx_employees_role ON employees(role);
-CREATE INDEX idx_employees_code ON employees(employee_code);
+CREATE INDEX idx_employees_email ON employees(email);
 CREATE INDEX idx_donors_blood_type ON donors(blood_type);
 CREATE INDEX idx_donors_status ON donors(status);
 CREATE INDEX idx_recipients_blood_type ON recipients(blood_type);

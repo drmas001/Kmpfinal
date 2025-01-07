@@ -15,15 +15,12 @@ import {
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { loginWithEmployeeCode } from '@/lib/api/auth';
+import { signInWithEmail } from '@/lib/api/auth';
 import { useAuth } from '@/lib/contexts/auth';
 
 const loginSchema = z.object({
-  employeeCode: z
-    .string()
-    .min(1, 'Employee code is required')
-    .max(20, 'Employee code must be less than 20 characters')
-    .regex(/^[A-Za-z0-9-]+$/, 'Employee code must contain only letters, numbers, and hyphens'),
+  email: z.string().email('Please enter a valid email address'),
+  password: z.string().min(6, 'Password must be at least 6 characters'),
 });
 
 type LoginFormData = z.infer<typeof loginSchema>;
@@ -32,26 +29,46 @@ export function LoginPage() {
   const navigate = useNavigate();
   const { login } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      employeeCode: '',
+      email: '',
+      password: '',
     },
   });
 
   const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true);
+    setErrorMessage(null);
+    
     try {
-      const employee = await loginWithEmployeeCode(data.employeeCode);
+      console.log('Attempting to sign in with:', data.email);
+      const employee = await signInWithEmail(data.email, data.password);
+      console.log('Sign in successful:', employee);
       login(employee);
       toast.success('Login successful');
-      
-      // Navigate to dashboard after successful login
       navigate('/dashboard', { replace: true });
     } catch (error) {
       console.error('Login error:', error);
-      toast.error('Invalid employee code');
+      
+      let message = 'An unexpected error occurred. Please try again.';
+      
+      if (error instanceof Error) {
+        if (error.message.includes('Invalid login credentials')) {
+          message = 'Invalid email or password';
+        } else if (error.message.includes('Email not confirmed')) {
+          message = 'Please confirm your email address';
+        } else if (error.message.includes('Employee record not found')) {
+          message = 'Account not properly set up. Please contact your administrator.';
+        } else {
+          message = 'An error occurred during login. Please try again.';
+        }
+      }
+      
+      setErrorMessage(message);
+      toast.error(message);
     } finally {
       setIsLoading(false);
     }
@@ -70,24 +87,52 @@ export function LoginPage() {
             Login to Kidney Match Pro
           </h1>
           <p className="text-sm text-muted-foreground mt-2">
-            Access dashboard using your unique Employee Code
+            Enter your email and password to access the dashboard
           </p>
         </div>
 
         <div className="rounded-lg border bg-card p-6">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              {errorMessage && (
+                <div className="p-3 rounded-md bg-destructive/10 text-destructive text-sm">
+                  {errorMessage}
+                </div>
+              )}
+              
               <FormField
                 control={form.control}
-                name="employeeCode"
+                name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Employee Code</FormLabel>
+                    <FormLabel>Email</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="Enter your employee code"
+                        type="email"
+                        placeholder="Enter your email"
                         {...field}
                         disabled={isLoading}
+                        autoComplete="email"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Password</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="password"
+                        placeholder="Enter your password"
+                        {...field}
+                        disabled={isLoading}
+                        autoComplete="current-password"
                       />
                     </FormControl>
                     <FormMessage />

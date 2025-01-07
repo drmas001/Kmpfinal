@@ -45,12 +45,57 @@ export function DonorForm() {
 
   const onSubmit = async (data: DonorFormData) => {
     try {
+      // Validate required fields
+      if (!data.bloodType) {
+        toast.error('Please select a blood type');
+        return;
+      }
+      if (!data.crossmatchResult) {
+        toast.error('Please select a crossmatch result');
+        return;
+      }
+      if (!data.cmvStatus) {
+        toast.error('Please select a CMV status');
+        return;
+      }
+
+      // Show loading state
+      const loadingToast = toast.loading('Saving donor information...');
+
+      // Create donor with better error logging
+      console.log('Submitting donor data:', data); // Debug log
       await createDonor(data);
+      
+      // Clear loading state and show success
+      toast.dismiss(loadingToast);
       toast.success('Donor information saved successfully');
+      
+      // Navigate to donors list
       navigate('/donors');
     } catch (error) {
-      console.error('Error saving donor:', error);
-      toast.error('Failed to save donor information');
+      console.error('Detailed error:', {
+        error,
+        message: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : undefined,
+      });
+      
+      toast.dismiss();
+      
+      if (error instanceof Error) {
+        if (error.message.includes('duplicate key')) {
+          if (error.message.includes('mrn')) {
+            toast.error('A donor with this MRN already exists');
+          } else if (error.message.includes('national_id')) {
+            toast.error('A donor with this National ID already exists');
+          } else {
+            toast.error('A donor with these details already exists');
+          }
+        } else {
+          toast.error(`Error: ${error.message}`);
+        }
+      } else {
+        toast.error('Failed to save donor information. Please check the console for details.');
+      }
     }
   };
 
