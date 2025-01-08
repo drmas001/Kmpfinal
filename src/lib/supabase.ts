@@ -1,21 +1,25 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-const supabaseServiceRoleKey = import.meta.env.SUPABASE_SERVICE_ROLE_KEY;
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
 
-if (!supabaseUrl) {
-  throw new Error('Missing environment variable: VITE_SUPABASE_URL');
+if (!supabaseUrl || !supabaseUrl.startsWith('https://')) {
+  throw new Error('Invalid or missing VITE_SUPABASE_URL. Must be a valid HTTPS URL.');
 }
 
 if (!supabaseAnonKey) {
   throw new Error('Missing environment variable: VITE_SUPABASE_ANON_KEY');
 }
 
-// Create a client with the anon key for public operations
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+// Create a single client instance for all operations
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: true
+  }
+});
 
-// Create an admin client with the service role key for admin operations
-export const supabaseAdmin = supabaseServiceRoleKey 
-  ? createClient(supabaseUrl, supabaseServiceRoleKey)
-  : supabase; // Fallback to regular client if service role key is not available
+// Export the same instance for admin operations
+// This is safer for client-side usage
+export const supabaseAdmin = supabase;
