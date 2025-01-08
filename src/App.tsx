@@ -21,26 +21,35 @@ export default function App() {
   return (
     <AuthProvider>
       <Routes>
-        {/* Public Routes - Landing, Login, and Learn More */}
+        {/* Public Routes - Only Landing, Login, and Learn More */}
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/learn-more" element={<LearnMore />} />
         
-        {/* Protected Routes with Layout */}
+        {/* Protected Routes - Require Authentication */}
         <Route element={<RequireAuth><Layout /></RequireAuth>}>
+          {/* Dashboard - Main authenticated landing page */}
           <Route path="/dashboard" element={<Dashboard />} />
+          
+          {/* Donor Management */}
           <Route path="/donors">
             <Route index element={<DonorList />} />
             <Route path="new" element={<DonorForm />} />
             <Route path="edit/:id" element={<DonorEditForm />} />
           </Route>
+          
+          {/* Recipient Management */}
           <Route path="/recipients">
             <Route index element={<RecipientList />} />
             <Route path="new" element={<RecipientForm />} />
             <Route path="edit/:id" element={<RecipientEditForm />} />
           </Route>
+          
+          {/* Other Protected Features */}
           <Route path="/matching" element={<MatchingSystem />} />
           <Route path="/reports" element={<Reports />} />
+          
+          {/* Admin Panel - Additional Role Check */}
           <Route path="/admin" element={
             <RequireAuth allowedRoles={['Administrator']}>
               <AdminPanel />
@@ -48,7 +57,7 @@ export default function App() {
           } />
         </Route>
 
-        {/* Catch-all route - redirect to login */}
+        {/* Catch-all - Redirect to login for unauthenticated users */}
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
       <Toaster />

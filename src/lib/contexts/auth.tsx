@@ -56,23 +56,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (session?.user) {
           // Verify session expiry
           const now = new Date().getTime();
-          const expiresAt = new Date(session.expires_at!).getTime();
+          const expiresAt = session.expires_at ? new Date(session.expires_at).getTime() : 0;
           
           if (now >= expiresAt) {
             console.log('Session expired, logging out');
             await supabase.auth.signOut();
-            setEmployee(null);
+            if (mounted) {
+              setEmployee(null);
+            }
             return;
           }
 
           // Get the employee data
           const employeeData = await fetchEmployeeData(session.user.id);
           
-          if (mounted && employeeData) {
-            setEmployee(employeeData);
-          } else {
-            // If no employee data found, sign out
-            await supabase.auth.signOut();
+          if (mounted) {
+            if (employeeData) {
+              console.log('Setting employee data:', employeeData);
+              setEmployee(employeeData);
+            } else {
+              // If no employee data found, sign out
+              console.log('No employee data found, signing out');
+              await supabase.auth.signOut();
+              setEmployee(null);
+            }
+          }
+        } else {
+          if (mounted) {
             setEmployee(null);
           }
         }
@@ -95,29 +105,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     // Subscribe to auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('Auth state changed:', event, session?.user?.id);
+      
       if (event === 'SIGNED_IN' && session?.user) {
         const employeeData = await fetchEmployeeData(session.user.id);
         
         if (mounted) {
           if (employeeData) {
+            console.log('Setting employee data after sign in:', employeeData);
             setEmployee(employeeData);
           } else {
             // If no employee data found, sign out
+            console.log('No employee data found after sign in, signing out');
             await supabase.auth.signOut();
             setEmployee(null);
-            navigate('/login');
           }
         }
       } else if (event === 'SIGNED_OUT') {
+        console.log('User signed out');
         if (mounted) {
           setEmployee(null);
-          navigate('/');
+          navigate('/login', { replace: true });
         }
       } else if (event === 'TOKEN_REFRESHED') {
+        console.log('Token refreshed');
         // Refresh employee data when token is refreshed
         if (session?.user) {
           const employeeData = await fetchEmployeeData(session.user.id);
           if (mounted && employeeData) {
+            console.log('Setting employee data after token refresh:', employeeData);
             setEmployee(employeeData);
           }
         }
@@ -126,26 +142,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     // Cleanup subscription and prevent memory leaks
     return () => {
+      console.log('Cleaning up auth provider');
       mounted = false;
       subscription.unsubscribe();
     };
   }, [navigate]);
 
   const login = (employee: Employee) => {
+    console.log('Login called with employee:', employee);
     setEmployee(employee);
   };
 
   const logout = async () => {
     try {
+      console.log('Logging out');
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
       setEmployee(null);
-      navigate('/');
+      navigate('/login', { replace: true });
     } catch (error) {
       console.error('Logout error:', error);
       // Force clear the state even if the API call fails
       setEmployee(null);
-      navigate('/');
+      navigate('/login', { replace: true });
     }
   };
 

@@ -35,10 +35,9 @@ export function LoginPage() {
   // Redirect if already authenticated
   useEffect(() => {
     if (!isAuthLoading && employee) {
-      const from = location.state?.from?.pathname || '/dashboard';
-      navigate(from, { replace: true });
+      navigate('/dashboard', { replace: true });
     }
-  }, [employee, isAuthLoading, navigate, location]);
+  }, [employee, isAuthLoading, navigate]);
 
   const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -53,13 +52,18 @@ export function LoginPage() {
     setErrorMessage(null);
     
     try {
-      console.log('Attempting to sign in with:', data.email);
-      const employee = await signInWithEmail(data.email, data.password);
-      console.log('Sign in successful:', employee);
-      login(employee);
+      // Attempt to sign in and get employee data
+      const employeeData = await signInWithEmail(data.email, data.password);
+      
+      // Update auth context with employee data
+      login(employeeData);
+      
+      // Show success message
       toast.success('Login successful');
-      const from = location.state?.from?.pathname || '/dashboard';
-      navigate(from, { replace: true });
+      
+      // Navigate to dashboard immediately after successful login
+      navigate('/dashboard', { replace: true });
+      
     } catch (error) {
       console.error('Login error:', error);
       
