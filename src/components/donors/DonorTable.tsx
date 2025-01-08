@@ -10,10 +10,12 @@ import { Button } from '@/components/ui/button';
 import { Trash2, Pencil } from 'lucide-react';
 import type { Donor } from '@/types/matching';
 
+type DonorWithStatus = Donor & { status: 'Available' | 'Utilized' };
+
 interface DonorTableProps {
-  donors: Donor[];
-  onDelete: (donor: Donor) => void;
-  onEdit: (donor: Donor) => void;
+  donors: DonorWithStatus[];
+  onDelete: (donor: DonorWithStatus) => void;
+  onEdit: (donor: DonorWithStatus) => void;
 }
 
 export function DonorTable({ donors, onDelete, onEdit }: DonorTableProps) {

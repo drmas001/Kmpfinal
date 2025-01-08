@@ -1,25 +1,64 @@
-import type { Database } from './supabase';
-
 export type BloodType = 'O-' | 'O+' | 'A-' | 'A+' | 'B-' | 'B+' | 'AB-' | 'AB+';
 
-export type HLAType = string;
-
 export interface HLATyping {
-  hla_a?: string | null;
-  hla_b?: string | null;
-  hla_c?: string | null;
-  hla_dr?: string | null;
-  hla_dq?: string | null;
-  hla_dp?: string | null;
+  hlaA: string;
+  hlaB: string;
+  hlaC: string;
+  hlaDR: string;
+  hlaDQ: string;
+  hlaDP: string;
 }
 
-export type Donor = Database['public']['Tables']['donors']['Row'];
-export type DonorInsert = Database['public']['Tables']['donors']['Insert'];
-export type DonorUpdate = Database['public']['Tables']['donors']['Update'];
+export interface DSAResult {
+  detected: boolean;
+  mfi?: number;
+}
 
-export type Recipient = Database['public']['Tables']['recipients']['Row'];
-export type RecipientInsert = Database['public']['Tables']['recipients']['Insert'];
-export type RecipientUpdate = Database['public']['Tables']['recipients']['Update'];
+export interface Recipient {
+  id: string;
+  mrn: string;
+  nationalId: string;
+  fullName: string;
+  age: number;
+  bloodType: string;
+  mobileNumber: string;
+  hlaTyping: HLATyping;
+  pra: number;
+  crossmatchRequirement: string;
+  viralScreening: string;
+  cmvStatus: string;
+  unacceptableAntigens: string;
+  donorAntibodies: string;
+  medicalHistory: string;
+  notes: string;
+  serumCreatinine: number;
+  egfr: number;
+  bloodPressure: string;
+}
+
+export interface Donor {
+  id: string;
+  mrn: string;
+  nationalId: string;
+  fullName: string;
+  age: number;
+  bloodType: string;
+  mobileNumber: string;
+  hlaTyping: HLATyping;
+  crossmatchResult: string;
+  donorAntibodies: string;
+  serumCreatinine: number;
+  egfr: number;
+  bloodPressure: string;
+  viralScreening: string;
+  cmvStatus: string;
+  medicalConditions: string;
+  notes: string;
+  highResTyping: string;
+  antigenMismatch: number;
+  dsaResult: DSAResult;
+  status: 'Available' | 'Utilized';
+}
 
 export interface MatchingResult {
   donor: Donor;

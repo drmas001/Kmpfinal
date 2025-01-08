@@ -9,11 +9,13 @@ import { getDonors, deleteDonor } from '@/lib/api/donors';
 import type { Donor } from '@/types/matching';
 import { toast } from 'sonner';
 
+type DonorWithStatus = Donor & { status: 'Available' | 'Utilized' };
+
 export function DonorList() {
   const navigate = useNavigate();
-  const [donors, setDonors] = useState<Donor[]>([]);
-  const [filteredDonors, setFilteredDonors] = useState<Donor[]>([]);
-  const [selectedDonor, setSelectedDonor] = useState<Donor | null>(null);
+  const [donors, setDonors] = useState<DonorWithStatus[]>([]);
+  const [filteredDonors, setFilteredDonors] = useState<DonorWithStatus[]>([]);
+  const [selectedDonor, setSelectedDonor] = useState<DonorWithStatus | null>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -42,7 +44,7 @@ export function DonorList() {
       const searchTerm = query.toLowerCase();
       filtered = filtered.filter(
         (donor) =>
-          donor.full_name.toLowerCase().includes(searchTerm) ||
+          donor.fullName.toLowerCase().includes(searchTerm) ||
           donor.mrn.toLowerCase().includes(searchTerm)
       );
     }
@@ -50,7 +52,7 @@ export function DonorList() {
     // Apply blood type filter
     if (filters.bloodType) {
       filtered = filtered.filter(
-        (donor) => donor.blood_type === filters.bloodType
+        (donor) => donor.bloodType === filters.bloodType
       );
     }
 
@@ -64,7 +66,7 @@ export function DonorList() {
     setFilteredDonors(filtered);
   };
 
-  const handleDelete = async (donor: Donor) => {
+  const handleDelete = async (donor: DonorWithStatus) => {
     if (donor.status === 'Utilized') {
       toast.error('Cannot delete a utilized donor');
       return;
@@ -73,7 +75,7 @@ export function DonorList() {
     setShowDeleteDialog(true);
   };
 
-  const handleEdit = (donor: Donor) => {
+  const handleEdit = (donor: DonorWithStatus) => {
     navigate(`/donors/edit/${donor.id}`);
   };
 

@@ -8,9 +8,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import type { Database } from '@/types/supabase';
+import type { Donor } from '@/types/matching';
 
-type DonorWithStatus = Database['public']['Tables']['donors']['Row'];
+type DonorWithStatus = Donor & { status: 'Available' | 'Utilized' };
 
 interface DonorDeleteDialogProps {
   open: boolean;
@@ -33,7 +33,7 @@ export function DonorDeleteDialog({
         <AlertDialogHeader>
           <AlertDialogTitle>Delete Donor Record</AlertDialogTitle>
           <AlertDialogDescription>
-            Are you sure you want to delete {donor.full_name}'s record? This action
+            Are you sure you want to delete {donor.fullName}'s record? This action
             cannot be undone.
           </AlertDialogDescription>
         </AlertDialogHeader>
