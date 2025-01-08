@@ -1,25 +1,21 @@
 import { createClient } from '@supabase/supabase-js';
 
-if (!import.meta.env.VITE_SUPABASE_URL) {
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const supabaseServiceRoleKey = import.meta.env.SUPABASE_SERVICE_ROLE_KEY;
+
+if (!supabaseUrl) {
   throw new Error('Missing environment variable: VITE_SUPABASE_URL');
 }
 
-if (!import.meta.env.VITE_SUPABASE_ANON_KEY) {
+if (!supabaseAnonKey) {
   throw new Error('Missing environment variable: VITE_SUPABASE_ANON_KEY');
 }
 
-if (!import.meta.env.SUPABASE_SERVICE_ROLE_KEY) {
-  throw new Error('Missing environment variable: SUPABASE_SERVICE_ROLE_KEY');
-}
-
 // Create a client with the anon key for public operations
-export const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_ANON_KEY
-);
+export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 // Create an admin client with the service role key for admin operations
-export const supabaseAdmin = createClient(
-  import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.SUPABASE_SERVICE_ROLE_KEY
-);
+export const supabaseAdmin = supabaseServiceRoleKey 
+  ? createClient(supabaseUrl, supabaseServiceRoleKey)
+  : supabase; // Fallback to regular client if service role key is not available
