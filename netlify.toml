@@ -1,13 +1,6 @@
 [build]
-  command = "CI=false npm run build"
+  command = "npm run build"
   publish = "dist"
-
-[build.environment]
-  NODE_VERSION = "18"
-  NPM_FLAGS = "--legacy-peer-deps --force"
-  VITE_SUPABASE_URL = "${VITE_SUPABASE_URL}"
-  VITE_SUPABASE_ANON_KEY = "${VITE_SUPABASE_ANON_KEY}"
-  SUPABASE_SERVICE_ROLE_KEY = "${SUPABASE_SERVICE_ROLE_KEY}"
 
 [[redirects]]
   from = "/*"
