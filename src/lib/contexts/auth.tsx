@@ -158,8 +158,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, [navigate]);
 
-  const login = (employee: Employee) => {
-    setEmployee(employee);
+  const login = (employeeData: Employee) => {
+    console.log('Setting employee data:', employeeData);
+    setEmployee(employeeData);
   };
 
   const logout = async () => {

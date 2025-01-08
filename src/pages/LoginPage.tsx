@@ -54,13 +54,16 @@ export function LoginPage() {
       // Attempt to sign in and get employee data
       const employeeData = await signInWithEmail(data.email, data.password);
       
-      // Update auth context with employee data
-      login(employeeData);
-      
       // Show success message
       toast.success('Login successful');
       
-      // Navigate to dashboard immediately after successful login
+      // Update auth context with employee data
+      login(employeeData);
+      
+      // Wait for a brief moment to ensure state is updated
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      // Navigate to dashboard
       navigate('/dashboard', { replace: true });
       
     } catch (error) {
