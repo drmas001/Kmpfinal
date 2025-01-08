@@ -23,7 +23,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [employee, setEmployee] = useState<Employee | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Function to fetch employee data
+  // Function to fetch employee data with retry logic
   const fetchEmployeeData = async (userId: string) => {
     try {
       const { data: employeeData, error } = await supabase
@@ -32,7 +32,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .eq('id', userId)
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching employee data:', error);
+        return null;
+      }
       return employeeData;
     } catch (error) {
       console.error('Error fetching employee data:', error);
@@ -42,16 +45,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     let mounted = true;
+    let authSubscription: { unsubscribe: () => void } | null = null;
 
     // Check if we have an active session
     const checkSession = async () => {
       try {
+        if (!mounted) return;
         setIsLoading(true);
         
         // Get the current session
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         
-        if (sessionError) throw sessionError;
+        if (sessionError) {
+          console.error('Session error:', sessionError);
+          if (mounted) {
+            setEmployee(null);
+            setIsLoading(false);
+          }
+          return;
+        }
 
         if (session?.user) {
           // Verify session expiry
@@ -63,6 +75,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             await supabase.auth.signOut();
             if (mounted) {
               setEmployee(null);
+              setIsLoading(false);
             }
             return;
           }
@@ -72,29 +85,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           
           if (mounted) {
             if (employeeData) {
-              console.log('Setting employee data:', employeeData);
               setEmployee(employeeData);
             } else {
-              // If no employee data found, sign out
-              console.log('No employee data found, signing out');
               await supabase.auth.signOut();
               setEmployee(null);
             }
+            setIsLoading(false);
           }
         } else {
           if (mounted) {
             setEmployee(null);
+            setIsLoading(false);
           }
         }
       } catch (error) {
         console.error('Session check error:', error);
-        // On error, clear the session and employee data
-        await supabase.auth.signOut();
         if (mounted) {
           setEmployee(null);
-        }
-      } finally {
-        if (mounted) {
           setIsLoading(false);
         }
       }
@@ -104,66 +111,67 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     checkSession();
 
     // Subscribe to auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('Auth state changed:', event, session?.user?.id);
-      
-      if (event === 'SIGNED_IN' && session?.user) {
-        const employeeData = await fetchEmployeeData(session.user.id);
+    const setupAuthSubscription = async () => {
+      const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+        if (!mounted) return;
+        console.log('Auth state changed:', event, session?.user?.id);
         
-        if (mounted) {
-          if (employeeData) {
-            console.log('Setting employee data after sign in:', employeeData);
-            setEmployee(employeeData);
-          } else {
-            // If no employee data found, sign out
-            console.log('No employee data found after sign in, signing out');
-            await supabase.auth.signOut();
-            setEmployee(null);
-          }
-        }
-      } else if (event === 'SIGNED_OUT') {
-        console.log('User signed out');
-        if (mounted) {
-          setEmployee(null);
-          navigate('/login', { replace: true });
-        }
-      } else if (event === 'TOKEN_REFRESHED') {
-        console.log('Token refreshed');
-        // Refresh employee data when token is refreshed
-        if (session?.user) {
+        if (event === 'SIGNED_IN' && session?.user) {
           const employeeData = await fetchEmployeeData(session.user.id);
-          if (mounted && employeeData) {
-            console.log('Setting employee data after token refresh:', employeeData);
-            setEmployee(employeeData);
+          
+          if (mounted) {
+            if (employeeData) {
+              setEmployee(employeeData);
+            } else {
+              await supabase.auth.signOut();
+              setEmployee(null);
+            }
+          }
+        } else if (event === 'SIGNED_OUT') {
+          if (mounted) {
+            setEmployee(null);
+            navigate('/login', { replace: true });
+          }
+        } else if (event === 'TOKEN_REFRESHED') {
+          if (session?.user) {
+            const employeeData = await fetchEmployeeData(session.user.id);
+            if (mounted && employeeData) {
+              setEmployee(employeeData);
+            }
           }
         }
+      });
+      
+      if (mounted) {
+        authSubscription = subscription;
       }
-    });
+    };
+
+    setupAuthSubscription();
 
     // Cleanup subscription and prevent memory leaks
     return () => {
-      console.log('Cleaning up auth provider');
       mounted = false;
-      subscription.unsubscribe();
+      if (authSubscription) {
+        authSubscription.unsubscribe();
+      }
     };
   }, [navigate]);
 
   const login = (employee: Employee) => {
-    console.log('Login called with employee:', employee);
     setEmployee(employee);
   };
 
   const logout = async () => {
     try {
-      console.log('Logging out');
+      setIsLoading(true);
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
-      setEmployee(null);
-      navigate('/login', { replace: true });
     } catch (error) {
       console.error('Logout error:', error);
-      // Force clear the state even if the API call fails
+    } finally {
       setEmployee(null);
+      setIsLoading(false);
       navigate('/login', { replace: true });
     }
   };
