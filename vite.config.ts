@@ -20,7 +20,16 @@ export default defineConfig({
     }
   },
   optimizeDeps: {
-    exclude: ['@supabase/supabase-js']
+    esbuildOptions: {
+      // Node.js global to browser globalThis
+      define: {
+        global: 'globalThis'
+      },
+    },
+    include: [
+      '@supabase/supabase-js',
+      '@supabase/postgrest-js',
+    ],
   },
   resolve: {
     alias: {

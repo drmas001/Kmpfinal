@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import {
   Activity,
@@ -10,9 +11,25 @@ import {
   CheckCircle,
   Star,
 } from 'lucide-react';
+import { useAuth } from '@/lib/contexts/auth';
 
 export function LandingPage() {
   const navigate = useNavigate();
+  const { employee, isLoading } = useAuth();
+
+  useEffect(() => {
+    if (!isLoading && employee) {
+      navigate('/dashboard', { replace: true });
+    }
+  }, [employee, isLoading, navigate]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-pulse">Loading...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-muted">

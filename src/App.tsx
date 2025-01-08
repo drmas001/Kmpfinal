@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { RequireAuth } from '@/components/auth/RequireAuth';
 import { Layout } from '@/components/layout/Layout';
 import { LoginPage } from '@/pages/LoginPage';
@@ -21,13 +21,14 @@ export default function App() {
   return (
     <AuthProvider>
       <Routes>
+        {/* Public Routes - Landing, Login, and Learn More */}
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/learn-more" element={<LearnMore />} />
         
-        {/* Protected Routes */}
+        {/* Protected Routes with Layout */}
         <Route element={<RequireAuth><Layout /></RequireAuth>}>
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/learn-more" element={<LearnMore />} />
           <Route path="/donors">
             <Route index element={<DonorList />} />
             <Route path="new" element={<DonorForm />} />
@@ -40,15 +41,15 @@ export default function App() {
           </Route>
           <Route path="/matching" element={<MatchingSystem />} />
           <Route path="/reports" element={<Reports />} />
-          <Route
-            path="/admin"
-            element={
-              <RequireAuth allowedRoles={['Administrator']}>
-                <AdminPanel />
-              </RequireAuth>
-            }
-          />
+          <Route path="/admin" element={
+            <RequireAuth allowedRoles={['Administrator']}>
+              <AdminPanel />
+            </RequireAuth>
+          } />
         </Route>
+
+        {/* Catch-all route - redirect to login */}
+        <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
       <Toaster />
     </AuthProvider>

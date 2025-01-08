@@ -23,32 +23,70 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [employee, setEmployee] = useState<Employee | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Function to fetch employee data
+  const fetchEmployeeData = async (userId: string) => {
+    try {
+      const { data: employeeData, error } = await supabase
+        .from('employees')
+        .select('*')
+        .eq('id', userId)
+        .single();
+
+      if (error) throw error;
+      return employeeData;
+    } catch (error) {
+      console.error('Error fetching employee data:', error);
+      return null;
+    }
+  };
+
   useEffect(() => {
+    let mounted = true;
+
     // Check if we have an active session
     const checkSession = async () => {
       try {
         setIsLoading(true);
         
         // Get the current session
-        const { data: { session } } = await supabase.auth.getSession();
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         
-        if (session?.user) {
-          // Get the employee data
-          const { data: employeeData, error } = await supabase
-            .from('employees')
-            .select('*')
-            .eq('id', session.user.id)
-            .single();
+        if (sessionError) throw sessionError;
 
-          if (error) throw error;
+        if (session?.user) {
+          // Verify session expiry
+          const now = new Date().getTime();
+          const expiresAt = new Date(session.expires_at!).getTime();
           
-          setEmployee(employeeData);
+          if (now >= expiresAt) {
+            console.log('Session expired, logging out');
+            await supabase.auth.signOut();
+            setEmployee(null);
+            return;
+          }
+
+          // Get the employee data
+          const employeeData = await fetchEmployeeData(session.user.id);
+          
+          if (mounted && employeeData) {
+            setEmployee(employeeData);
+          } else {
+            // If no employee data found, sign out
+            await supabase.auth.signOut();
+            setEmployee(null);
+          }
         }
       } catch (error) {
         console.error('Session check error:', error);
-        setEmployee(null);
+        // On error, clear the session and employee data
+        await supabase.auth.signOut();
+        if (mounted) {
+          setEmployee(null);
+        }
       } finally {
-        setIsLoading(false);
+        if (mounted) {
+          setIsLoading(false);
+        }
       }
     };
 
@@ -58,23 +96,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Subscribe to auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_IN' && session?.user) {
-        const { data: employeeData, error } = await supabase
-          .from('employees')
-          .select('*')
-          .eq('id', session.user.id)
-          .single();
-
-        if (!error) {
-          setEmployee(employeeData);
+        const employeeData = await fetchEmployeeData(session.user.id);
+        
+        if (mounted) {
+          if (employeeData) {
+            setEmployee(employeeData);
+          } else {
+            // If no employee data found, sign out
+            await supabase.auth.signOut();
+            setEmployee(null);
+            navigate('/login');
+          }
         }
       } else if (event === 'SIGNED_OUT') {
-        setEmployee(null);
-        navigate('/');
+        if (mounted) {
+          setEmployee(null);
+          navigate('/');
+        }
+      } else if (event === 'TOKEN_REFRESHED') {
+        // Refresh employee data when token is refreshed
+        if (session?.user) {
+          const employeeData = await fetchEmployeeData(session.user.id);
+          if (mounted && employeeData) {
+            setEmployee(employeeData);
+          }
+        }
       }
     });
 
-    // Cleanup subscription
+    // Cleanup subscription and prevent memory leaks
     return () => {
+      mounted = false;
       subscription.unsubscribe();
     };
   }, [navigate]);
@@ -84,9 +136,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const logout = async () => {
-    await supabase.auth.signOut();
-    setEmployee(null);
-    navigate('/');
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      setEmployee(null);
+      navigate('/');
+    } catch (error) {
+      console.error('Logout error:', error);
+      // Force clear the state even if the API call fails
+      setEmployee(null);
+      navigate('/');
+    }
   };
 
   return (

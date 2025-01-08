@@ -24,7 +24,7 @@ export function RequireAuth({ children, allowedRoles }: RequireAuthProps) {
   }
 
   if (allowedRoles && !allowedRoles.includes(employee.role)) {
-    return <Navigate to="/app" replace />;
+    return <Navigate to="/dashboard" replace />;
   }
 
   return <>{children}</>;

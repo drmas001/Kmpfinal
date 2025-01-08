@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Heart, Loader2 } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -27,9 +27,18 @@ type LoginFormData = z.infer<typeof loginSchema>;
 
 export function LoginPage() {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const location = useLocation();
+  const { login, employee, isLoading: isAuthLoading } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (!isAuthLoading && employee) {
+      const from = location.state?.from?.pathname || '/dashboard';
+      navigate(from, { replace: true });
+    }
+  }, [employee, isAuthLoading, navigate, location]);
 
   const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -49,7 +58,8 @@ export function LoginPage() {
       console.log('Sign in successful:', employee);
       login(employee);
       toast.success('Login successful');
-      navigate('/dashboard', { replace: true });
+      const from = location.state?.from?.pathname || '/dashboard';
+      navigate(from, { replace: true });
     } catch (error) {
       console.error('Login error:', error);
       
@@ -73,6 +83,15 @@ export function LoginPage() {
       setIsLoading(false);
     }
   };
+
+  // Show loading state while checking authentication
+  if (isAuthLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-pulse">Loading...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted p-4">
