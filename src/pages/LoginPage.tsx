@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Heart, Loader2 } from 'lucide-react';
 import { useForm } from 'react-hook-form';
@@ -15,89 +15,56 @@ import {
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { signInWithEmail } from '@/lib/api/auth';
+import { loginWithEmployeeCode } from '@/lib/api/auth';
 import { useAuth } from '@/lib/contexts/auth';
+import { employeeCodeSchema } from '@/lib/validations/employee';
 
 const loginSchema = z.object({
-  email: z.string().email('Please enter a valid email address'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
+  employeeCode: employeeCodeSchema,
 });
 
 type LoginFormData = z.infer<typeof loginSchema>;
 
 export function LoginPage() {
   const navigate = useNavigate();
-  const { login, employee, isLoading: isAuthLoading } = useAuth();
+  const { login } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-
-  // Redirect if already authenticated
-  useEffect(() => {
-    if (!isAuthLoading && employee) {
-      navigate('/dashboard', { replace: true });
-    }
-  }, [employee, isAuthLoading, navigate]);
 
   const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      email: '',
-      password: '',
+      employeeCode: '',
     },
   });
 
   const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true);
-    setErrorMessage(null);
-    
     try {
-      // Attempt to sign in and get employee data
-      const employeeData = await signInWithEmail(data.email, data.password);
+      console.log('Attempting employee code verification:', {
+        code: data.employeeCode
+      });
+      const employee = await loginWithEmployeeCode(data.employeeCode);
+      login(employee);
       
-      // Show success message
+      console.log('Login successful:', {
+        id: employee.id,
+        code: employee.employee_code,
+        name: employee.full_name,
+        role: employee.role
+      });
+      
       toast.success('Login successful');
       
-      // Update auth context with employee data
-      login(employeeData);
-      
-      // Wait for a brief moment to ensure state is updated
-      await new Promise(resolve => setTimeout(resolve, 100));
-      
-      // Navigate to dashboard
+      // Navigate to dashboard after successful login
       navigate('/dashboard', { replace: true });
-      
     } catch (error) {
       console.error('Login error:', error);
-      
-      let message = 'An unexpected error occurred. Please try again.';
-      
-      if (error instanceof Error) {
-        if (error.message.includes('Invalid login credentials')) {
-          message = 'Invalid email or password';
-        } else if (error.message.includes('Email not confirmed')) {
-          message = 'Please confirm your email address';
-        } else if (error.message.includes('Employee record not found')) {
-          message = 'Account not properly set up. Please contact your administrator.';
-        } else {
-          message = 'An error occurred during login. Please try again.';
-        }
-      }
-      
-      setErrorMessage(message);
-      toast.error(message);
+      toast.error('Invalid employee code. Please check and try again.');
+      form.reset();
     } finally {
       setIsLoading(false);
     }
   };
-
-  // Show loading state while checking authentication
-  if (isAuthLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-pulse">Loading...</div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted p-4">
@@ -112,52 +79,25 @@ export function LoginPage() {
             Login to Kidney Match Pro
           </h1>
           <p className="text-sm text-muted-foreground mt-2">
-            Enter your email and password to access the dashboard
+            Access dashboard using your unique Employee Code
           </p>
         </div>
 
         <div className="rounded-lg border bg-card p-6">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              {errorMessage && (
-                <div className="p-3 rounded-md bg-destructive/10 text-destructive text-sm">
-                  {errorMessage}
-                </div>
-              )}
-              
               <FormField
                 control={form.control}
-                name="email"
+                name="employeeCode"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email</FormLabel>
+                    <FormLabel>Employee Code</FormLabel>
                     <FormControl>
                       <Input
-                        type="email"
-                        placeholder="Enter your email"
+                        placeholder="Enter your employee code"
                         {...field}
                         disabled={isLoading}
-                        autoComplete="email"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Password</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="password"
-                        placeholder="Enter your password"
-                        {...field}
-                        disabled={isLoading}
-                        autoComplete="current-password"
+                        autoComplete="off"
                       />
                     </FormControl>
                     <FormMessage />
@@ -171,7 +111,7 @@ export function LoginPage() {
                 disabled={isLoading}
               >
                 {isLoading && <Loader2 className="h-4 w-4 animate-spin" />}
-                {isLoading ? 'Logging in...' : 'Login'}
+                {isLoading ? 'Verifying...' : 'Login'}
               </Button>
             </form>
           </Form>

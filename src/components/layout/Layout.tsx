@@ -1,9 +1,13 @@
-import { Outlet } from 'react-router-dom';
+import { type ReactNode } from 'react';
 import { Header } from './Header';
 import { Sidebar } from './Sidebar';
 import { useState } from 'react';
 
-export function Layout() {
+interface LayoutProps {
+  children: ReactNode;
+}
+
+export function Layout({ children }: LayoutProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
@@ -28,7 +32,7 @@ export function Layout() {
         />
         <main className="flex-1 overflow-y-auto p-4 md:p-8">
           <div className="container mx-auto max-w-7xl">
-            <Outlet />
+            {children}
           </div>
         </main>
       </div>

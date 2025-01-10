@@ -1,95 +1,59 @@
-import { useState, useEffect } from 'react';
-import { EmployeeForm } from '@/components/admin/EmployeeForm';
-import { EmployeeList } from '@/components/admin/EmployeeList';
-import { EmployeeDeleteDialog } from '@/components/admin/EmployeeDeleteDialog';
-import { signUpWithEmail } from '@/lib/api/auth';
-import { deleteEmployee, getEmployees } from '@/lib/api/employees';
-import type { CreateEmployeeData, Employee } from '@/types/employee';
+import { useState } from 'react';
+import { supabase } from '@/lib/supabase';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
-import { Loader2 } from 'lucide-react';
+import { EmployeeForm } from '@/components/admin/EmployeeForm';
+
+interface Employee {
+  id: number;
+  email: string;
+  full_name: string;
+  employee_code: string;
+  role: string;
+}
 
 export function AdminPanel() {
   const [employees, setEmployees] = useState<Employee[]>([]);
-  const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    loadEmployees();
-  }, []);
-
-  const loadEmployees = async () => {
+  const handleAddEmployee = async (data: {
+    email: string;
+    full_name: string;
+    employee_code: string;
+    role: string;
+  }) => {
     try {
-      const data = await getEmployees();
-      setEmployees(data);
-    } catch (error) {
-      console.error('Error loading employees:', error);
-      toast.error('Failed to load employees');
-    } finally {
-      setIsLoading(false);
-    }
-  };
+      const { data: newEmployee, error } = await supabase
+        .from('employees')
+        .insert([{
+          email: data.email,
+          full_name: data.full_name,
+          employee_code: data.employee_code,
+          role: data.role
+        }])
+        .select()
+        .single();
 
-  const handleAddEmployee = async (data: CreateEmployeeData) => {
-    try {
-      const result = await signUpWithEmail(data.email, data.password, data.fullName, data.role);
-      setEmployees(prev => [...prev, result]);
-      toast.success('Employee account created successfully');
-    } catch (error) {
+      if (error) throw error;
+
+      setEmployees(prev => [...prev, newEmployee]);
+      toast.success('Employee added successfully');
+    } catch (error: any) {
       console.error('Error creating employee:', error);
-      toast.error(error instanceof Error ? error.message : 'Failed to create employee account');
+      toast.error(error.message || 'Failed to create employee');
     }
   };
-
-  const handleDeleteEmployee = (employee: Employee) => {
-    setSelectedEmployee(employee);
-    setShowDeleteDialog(true);
-  };
-
-  const confirmDelete = async () => {
-    if (!selectedEmployee) return;
-
-    try {
-      await deleteEmployee(selectedEmployee.id);
-      setEmployees(prev => prev.filter(emp => emp.id !== selectedEmployee.id));
-      toast.success('Employee account deleted successfully');
-    } catch (error) {
-      console.error('Error deleting employee:', error);
-      toast.error('Failed to delete employee account');
-    } finally {
-      setShowDeleteDialog(false);
-      setSelectedEmployee(null);
-    }
-  };
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
-  }
 
   return (
-    <div className="space-y-8">
-      <div className="rounded-lg border bg-card p-6">
-        <h1 className="text-2xl font-semibold mb-6">Employee Management</h1>
-        
-        <div className="space-y-8">
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle>Add New Employee</CardTitle>
+        </CardHeader>
+        <CardContent>
           <EmployeeForm onSubmit={handleAddEmployee} />
-          <EmployeeList 
-            employees={employees}
-            onDelete={handleDeleteEmployee}
-          />
-        </div>
-      </div>
-
-      <EmployeeDeleteDialog
-        open={showDeleteDialog}
-        onOpenChange={setShowDeleteDialog}
-        onConfirm={confirmDelete}
-        employee={selectedEmployee}
-      />
+        </CardContent>
+      </Card>
     </div>
   );
 }
