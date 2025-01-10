@@ -46,7 +46,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const { data: employeeData, error } = await supabase
         .from('employees')
         .select('*')
-        .eq('id', employee.id)
+        .eq('id', employee.id as any)
         .single();
 
       if (error || !employeeData) {
@@ -56,7 +56,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return false;
       }
 
-      setEmployee(employeeData);
+      const transformedEmployee: Employee = {
+        id: (employeeData as any).id,
+        fullName: (employeeData as any).full_name,
+        email: (employeeData as any).email,
+        role: (employeeData as any).role,
+        createdAt: (employeeData as any).created_at,
+        employee_code: (employeeData as any).employee_code
+      };
+
+      setEmployee(transformedEmployee);
       return true;
     } catch (error) {
       console.error('Error checking employee data:', error);

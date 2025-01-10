@@ -3,6 +3,7 @@ import type { Database } from '@/types/supabase';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const supabaseServiceKey = import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY;
 
 if (!supabaseUrl || !supabaseKey) {
   throw new Error('Missing Supabase environment variables');
@@ -28,15 +29,7 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseKey, {
     storage: localStorage,
     storageKey: 'supabase.auth.token',
     flowType: 'pkce',
-    debug: true,
-    cookieOptions: {
-      name: 'sb-auth-token',
-      lifetime: EXTENDED_SESSION_LENGTH,
-      domain: window.location.hostname,
-      sameSite: 'Lax',
-      path: '/',
-      secure: window.location.protocol === 'https:'
-    }
+    debug: true
   },
   db: {
     schema: 'public'
@@ -45,6 +38,13 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseKey, {
     headers: {
       'X-Client-Info': 'kidney-match-pro'
     }
+  }
+});
+
+export const supabaseAdmin = createClient<Database>(supabaseUrl, supabaseServiceKey || '', {
+  auth: {
+    autoRefreshToken: true,
+    persistSession: false
   }
 });
 

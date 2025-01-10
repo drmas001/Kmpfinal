@@ -61,7 +61,7 @@ export function EmployeeLoginPage() {
         console.log('Employee verification successful:', {
           id: employee.id,
           code: employee.employee_code,
-          name: employee.full_name,
+          name: employee.fullName,
           role: employee.role
         });
 
@@ -74,7 +74,7 @@ export function EmployeeLoginPage() {
           return;
         }
 
-        toast.success(`Welcome back, ${employee.full_name}!`);
+        toast.success(`Welcome back, ${employee.fullName}!`);
         
         // Check for stored redirect path
         const redirectPath = sessionStorage.getItem('auth_redirect') || '/dashboard';

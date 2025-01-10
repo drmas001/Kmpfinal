@@ -46,7 +46,7 @@ export async function createRecipient(data: RecipientFormData) {
     // Insert into database with better error handling
     const { data: recipient, error } = await supabase
       .from('recipients')
-      .insert([recipientData])
+      .insert(recipientData as any)
       .select()
       .single();
 
@@ -87,7 +87,7 @@ export async function getRecipient(id: string) {
   const { data: recipient, error } = await supabase
     .from('recipients')
     .select('*')
-    .eq('id', id)
+    .eq('id', id as any)
     .single();
 
   if (error) throw error;
@@ -123,8 +123,8 @@ export async function updateRecipient(id: string, data: Partial<RecipientFormDat
       cmv_status: data.cmvStatus,
       medical_history: data.medicalHistory,
       notes: data.notes,
-    })
-    .eq('id', id)
+    } as any)
+    .eq('id', id as any)
     .select()
     .single();
 
@@ -136,7 +136,7 @@ export async function deleteRecipient(id: string) {
   const { error } = await supabase
     .from('recipients')
     .delete()
-    .eq('id', id);
+    .eq('id', id as any);
 
   if (error) throw error;
 }

@@ -49,7 +49,7 @@ export function LoginPage() {
       console.log('Login successful:', {
         id: employee.id,
         code: employee.employee_code,
-        name: employee.full_name,
+        name: employee.fullName,
         role: employee.role
       });
       

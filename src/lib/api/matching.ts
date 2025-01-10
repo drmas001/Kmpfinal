@@ -10,7 +10,7 @@ export async function createMatchingResult(data: {
     crossmatch_compatible: boolean;
   };
 }) {
-  const { data: result, error } = await supabase.from('matching_results').insert([{
+  const { data: result, error } = await supabase.from('matching_results').insert({
     recipient_id: data.recipient_id,
     donor_id: data.donor_id,
     compatibility_score: data.compatibility_score,
@@ -19,8 +19,8 @@ export async function createMatchingResult(data: {
       hla_matches: data.match_details.hla_matches,
       crossmatch_compatible: data.match_details.crossmatch_compatible,
     },
-    status: 'Pending',
-  }]).select().single();
+    status: 'Pending'
+  } as any).select().single();
 
   if (error) throw error;
   return result;
@@ -34,7 +34,7 @@ export async function getMatchingResults(recipientId: string) {
       donor:donors(*),
       recipient:recipients(*)
     `)
-    .eq('recipient_id', recipientId)
+    .eq('recipient_id', recipientId as any)
     .order('compatibility_score', { ascending: false });
 
   if (error) throw error;
@@ -47,8 +47,8 @@ export async function updateMatchingResultStatus(
 ) {
   const { error } = await supabase
     .from('matching_results')
-    .update({ status })
-    .eq('id', id);
+    .update({ status } as any)
+    .eq('id', id as any);
 
   if (error) throw error;
 }
@@ -124,7 +124,7 @@ export async function findCompatibleDonors(recipientId: string) {
   const { data: recipientData, error: recipientError } = await supabase
     .from('recipients')
     .select('*')
-    .eq('id', recipientId)
+    .eq('id', recipientId as any)
     .single();
 
   if (recipientError) throw recipientError;
@@ -135,7 +135,7 @@ export async function findCompatibleDonors(recipientId: string) {
   const { data: donors, error: donorsError } = await supabase
     .from('donors')
     .select('*')
-    .eq('status', 'Available');
+    .eq('status', 'Available' as any);
 
   if (donorsError) throw donorsError;
 

@@ -1,42 +1,24 @@
-import { useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
 import { EmployeeForm } from '@/components/admin/EmployeeForm';
-
-interface Employee {
-  id: number;
-  email: string;
-  full_name: string;
-  employee_code: string;
-  role: string;
-}
+import type { CreateEmployeeData } from '@/types/employee';
 
 export function AdminPanel() {
-  const [employees, setEmployees] = useState<Employee[]>([]);
-
-  const handleAddEmployee = async (data: {
-    email: string;
-    full_name: string;
-    employee_code: string;
-    role: string;
-  }) => {
+  const handleAddEmployee = async (data: CreateEmployeeData) => {
     try {
-      const { data: newEmployee, error } = await supabase
+      const { error } = await supabase
         .from('employees')
         .insert([{
           email: data.email,
-          full_name: data.full_name,
-          employee_code: data.employee_code,
-          role: data.role
+          full_name: data.fullName,
+          role: data.role,
+          password: data.password
         }])
         .select()
         .single();
 
       if (error) throw error;
-
-      setEmployees(prev => [...prev, newEmployee]);
       toast.success('Employee added successfully');
     } catch (error: any) {
       console.error('Error creating employee:', error);

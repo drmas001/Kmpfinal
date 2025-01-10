@@ -1,10 +1,13 @@
 import { supabase } from '@/lib/supabase';
 import type { DonorFormData } from '@/types/donor';
 import type { Donor } from '@/types/matching';
+import type { Database } from '@/types/supabase';
+
+type DonorInsert = Database['public']['Tables']['donors']['Insert'];
 
 export async function createDonor(data: DonorFormData) {
   try {
-    const { data: donor, error } = await supabase.from('donors').insert([{
+    const insertData: DonorInsert = {
       mrn: data.mrn.toUpperCase(),
       national_id: data.nationalId.toUpperCase(),
       full_name: data.fullName,
@@ -30,8 +33,14 @@ export async function createDonor(data: DonorFormData) {
       cmv_status: data.cmvStatus,
       medical_conditions: data.medicalConditions,
       notes: data.notes,
-      status: 'Available',
-    }]).select().single();
+      status: 'Available'
+    };
+
+    const { data: donor, error } = await supabase
+      .from('donors')
+      .insert(insertData as any)
+      .select()
+      .single();
 
     if (error) {
       if (error.code === '23505') {
@@ -68,7 +77,7 @@ export async function getDonor(id: string) {
   const { data: donor, error } = await supabase
     .from('donors')
     .select('*')
-    .eq('id', id)
+    .eq('id', id as any)
     .single();
 
   if (error) throw error;
@@ -78,7 +87,6 @@ export async function getDonor(id: string) {
 
 export async function updateDonor(id: string, data: Partial<DonorFormData>) {
   try {
-    // Transform the data to match database schema
     const donorData = {
       mrn: data.mrn?.trim().toUpperCase(),
       national_id: data.nationalId?.trim().toUpperCase(),
@@ -105,12 +113,12 @@ export async function updateDonor(id: string, data: Partial<DonorFormData>) {
       cmv_status: data.cmvStatus,
       medical_conditions: data.medicalConditions?.trim() || '',
       notes: data.notes?.trim() || '',
-    };
+    } as any;
 
     const { data: donor, error } = await supabase
       .from('donors')
       .update(donorData)
-      .eq('id', id)
+      .eq('id', id as any)
       .select()
       .single();
 
@@ -143,7 +151,7 @@ export async function deleteDonor(id: string) {
   const { error } = await supabase
     .from('donors')
     .delete()
-    .eq('id', id);
+    .eq('id', id as any);
 
   if (error) throw error;
 }
@@ -151,8 +159,8 @@ export async function deleteDonor(id: string) {
 export async function updateDonorStatus(id: string, status: 'Available' | 'Utilized') {
   const { error } = await supabase
     .from('donors')
-    .update({ status })
-    .eq('id', id);
+    .update({ status } as any)
+    .eq('id', id as any);
 
   if (error) throw error;
 }
