@@ -9,7 +9,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "generate-types": "npx supabase gen types typescript --project-id drtslrzpunruzhrhzvef > src/types/supabase.ts",
-    "postinstall": "npm run generate-types"
+    "postinstall": "[ \"$SKIP_GENERATE_TYPES\" = \"true\" ] || npm run generate-types"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
