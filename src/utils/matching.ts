@@ -24,8 +24,8 @@ export function calculateHLAMatches(
     const loci = ['hla_a', 'hla_b', 'hla_c', 'hla_dr', 'hla_dq', 'hla_dp'] as const;
     
     for (const locus of loci) {
-      const donorAlleles = parseHLAAlleles(donor.hla_typing[locus] || '');
-      const recipientAlleles = parseHLAAlleles(recipient.hla_typing[locus] || '');
+      const donorAlleles = parseHLAAlleles((donor.hla_typing as Record<string, string>)[locus] || '');
+      const recipientAlleles = parseHLAAlleles((recipient.hla_typing as Record<string, string>)[locus] || '');
       
       // Find matching alleles
       const matchedAlleles = donorAlleles.filter(allele => 

@@ -1,15 +1,9 @@
 import { supabase, supabaseAdmin } from '@/lib/supabase';
 import type { Employee, CreateEmployeeData, EmployeeRole } from '@/types/employee';
+import type { Database } from '@/types/supabase';
 
-// Type for the database insert
-interface DatabaseEmployee {
-  id: string;
-  full_name: string;
-  email: string;
-  role: EmployeeRole;
-  created_at?: string;
-  last_active?: string;
-}
+type DbEmployee = Database['public']['Tables']['employees']['Row'];
+type DbEmployeeInsert = Database['public']['Tables']['employees']['Insert'];
 
 export async function getEmployees() {
   const { data: employees, error } = await supabase
@@ -48,16 +42,18 @@ export async function createEmployee(employeeData: CreateEmployeeData) {
     if (!authData.user) throw new Error('Failed to create auth user');
 
     // Then create the employee record
-    const dbEmployee: DatabaseEmployee = {
+    const newEmployee: DbEmployeeInsert = {
       id: authData.user.id,
       full_name: employeeData.fullName,
       email: employeeData.email,
-      role: employeeData.role
+      role: employeeData.role,
+      employee_code: Math.random().toString(36).substring(2, 8).toUpperCase(),
+      password_hash: '' // This is handled by Supabase Auth
     };
 
     const { data: employee, error: employeeError } = await supabase
       .from('employees')
-      .insert([dbEmployee])
+      .insert([newEmployee])
       .select()
       .single();
 
@@ -75,13 +71,14 @@ export async function createEmployee(employeeData: CreateEmployeeData) {
 }
 
 // Helper function to transform database employee data to match the Employee type
-function transformEmployeeData(data: DatabaseEmployee): Employee {
+function transformEmployeeData(data: DbEmployee): Employee {
   return {
     id: data.id,
     fullName: data.full_name,
     email: data.email,
-    role: data.role,
-    createdAt: data.created_at || new Date().toISOString(),
-    lastActive: data.last_active
+    role: data.role as EmployeeRole,
+    createdAt: data.created_at,
+    lastActive: data.updated_at || undefined,
+    employee_code: data.employee_code
   };
 }

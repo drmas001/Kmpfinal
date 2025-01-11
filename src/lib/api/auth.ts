@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/supabase';
-import type { Employee } from '@/types/employee';
+import type { Employee, EmployeeRole } from '@/types/employee';
 import type { Database } from '@/types/supabase';
 import { employeeCodeSchema } from '@/lib/validations/employee';
 
@@ -23,7 +23,7 @@ export async function loginWithEmployeeCode(employeeCode: string): Promise<Emplo
       return {
         id: employee.id,
         fullName: employee.full_name,
-        role: employee.role,
+        role: employee.role as EmployeeRole,
         createdAt: employee.created_at,
         employee_code: employee.employee_code,
         email: employee.email
@@ -44,7 +44,7 @@ export async function loginWithEmployeeCode(employeeCode: string): Promise<Emplo
     return {
       id: fallbackEmployee.id,
       fullName: fallbackEmployee.full_name,
-      role: fallbackEmployee.role,
+      role: fallbackEmployee.role as EmployeeRole,
       createdAt: fallbackEmployee.created_at,
       employee_code: fallbackEmployee.employee_code,
       email: fallbackEmployee.email

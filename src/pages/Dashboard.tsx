@@ -91,14 +91,14 @@ export function Dashboard() {
           id: donor.id,
           type: 'donor_added' as const,
           content: `New donor ${donor.full_name} added to the system`,
-          timestamp: donor.created_at,
+          timestamp: donor.created_at || new Date().toISOString(),
           status: 'success' as const,
         })) || []),
         ...(recentMatches?.map((match) => ({
           id: match.id,
           type: 'match_found' as const,
-          content: `Potential match found for recipient ${match.recipient[0].full_name}`,
-          timestamp: match.created_at,
+          content: `Potential match found for recipient ${match.recipient.full_name}`,
+          timestamp: match.created_at || new Date().toISOString(),
           status: match.status === 'Pending' ? 'warning' as const : 'info' as const,
         })) || []),
       ].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());

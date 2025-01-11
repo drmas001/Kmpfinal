@@ -159,12 +159,12 @@ export function generatePDF(data: ReportData) {
   addSection('HLA Typing Information');
   
   const hlaInfo = [
-    { label: 'HLA-A', value: recipient.hla_typing?.hla_a },
-    { label: 'HLA-B', value: recipient.hla_typing?.hla_b },
-    { label: 'HLA-C', value: recipient.hla_typing?.hla_c },
-    { label: 'HLA-DR', value: recipient.hla_typing?.hla_dr },
-    { label: 'HLA-DQ', value: recipient.hla_typing?.hla_dq },
-    { label: 'HLA-DP', value: recipient.hla_typing?.hla_dp }
+    { label: 'HLA-A', value: (recipient.hla_typing as { hla_a: string })?.hla_a },
+    { label: 'HLA-B', value: (recipient.hla_typing as { hla_b: string })?.hla_b },
+    { label: 'HLA-C', value: (recipient.hla_typing as { hla_c: string })?.hla_c },
+    { label: 'HLA-DR', value: (recipient.hla_typing as { hla_dr: string })?.hla_dr },
+    { label: 'HLA-DQ', value: (recipient.hla_typing as { hla_dq: string })?.hla_dq },
+    { label: 'HLA-DP', value: (recipient.hla_typing as { hla_dp: string })?.hla_dp }
   ];
 
   hlaInfo.forEach(info => {

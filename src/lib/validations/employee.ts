@@ -15,7 +15,8 @@ export const employeeSchema = z.object({
     .max(100, 'Password must be less than 100 characters'),
   role: z.enum(['Doctor', 'Nurse', 'Administrator'], {
     required_error: 'Role is required',
-  })
+  }),
+  employee_code: z.string().min(1, 'Employee code is required')
 });
 
 // Shared employee code validation for login

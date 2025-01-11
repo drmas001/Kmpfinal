@@ -76,8 +76,7 @@ export function Reports() {
       viral_screening: recipient.viralScreening || '',
       cmv_status: recipient.cmvStatus,
       medical_history: recipient.medicalHistory || '',
-      notes: recipient.notes || '',
-      preferred_matches: ''
+      notes: recipient.notes || ''
     };
 
     try {
