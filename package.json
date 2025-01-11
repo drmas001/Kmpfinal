@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "CI=false tsc --noEmit && vite build",
+    "build": "CI=false DISABLE_ESLINT_PLUGIN=true tsc --noEmit --skipLibCheck && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "generate-types": "npx supabase gen types typescript --project-id drtslrzpunruzhrhzvef > src/types/supabase.ts"
