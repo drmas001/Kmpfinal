@@ -13,14 +13,14 @@ export async function getEmployees() {
 
 export async function deleteEmployee(id: string) {
   // First, delete the auth user using admin client
-  const { error: authError } = await supabaseAdmin.auth.admin.deleteUser(id as any);
+  const { error: authError } = await supabaseAdmin.auth.admin.deleteUser(id);
   if (authError) throw authError;
 
   // Then delete the employee record
   const { error } = await supabase
     .from('employees')
     .delete()
-    .eq('id', id as any);
+    .eq('id', id);
 
   if (error) throw error;
 }
@@ -46,7 +46,7 @@ export async function createEmployee(data: CreateEmployeeData) {
         email: data.email,
         role: data.role,
         employee_code: data.employee_code
-      } as any)
+      })
       .select()
       .single();
 
