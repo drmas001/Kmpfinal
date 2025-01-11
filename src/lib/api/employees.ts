@@ -1,5 +1,5 @@
 import { supabase, supabaseAdmin } from '@/lib/supabase';
-import type { Employee } from '@/types/employee';
+import type { Employee, CreateEmployeeData } from '@/types/employee';
 
 export async function getEmployees() {
   const { data: employees, error } = await supabase
@@ -23,6 +23,44 @@ export async function deleteEmployee(id: string) {
     .eq('id', id as any);
 
   if (error) throw error;
+}
+
+export async function createEmployee(data: CreateEmployeeData) {
+  try {
+    // First create the auth user
+    const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
+      email: data.email,
+      password: data.password,
+      email_confirm: true
+    });
+
+    if (authError) throw authError;
+    if (!authData.user) throw new Error('Failed to create auth user');
+
+    // Then create the employee record
+    const { data: employee, error: employeeError } = await supabase
+      .from('employees')
+      .insert({
+        id: authData.user.id,
+        full_name: data.fullName,
+        email: data.email,
+        role: data.role,
+        employee_code: data.employee_code
+      } as any)
+      .select()
+      .single();
+
+    if (employeeError) {
+      // If employee creation fails, delete the auth user
+      await supabaseAdmin.auth.admin.deleteUser(authData.user.id);
+      throw employeeError;
+    }
+
+    return transformEmployeeData(employee);
+  } catch (error) {
+    console.error('Error creating employee:', error);
+    throw error;
+  }
 }
 
 // Helper function to transform database employee data to match the Employee type
