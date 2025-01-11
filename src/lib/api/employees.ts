@@ -25,6 +25,14 @@ export async function deleteEmployee(id: string) {
   if (error) throw error;
 }
 
+interface EmployeeInsert {
+  id: string;
+  full_name: string;
+  email: string;
+  role: string;
+  employee_code: string;
+}
+
 export async function createEmployee(data: CreateEmployeeData) {
   try {
     // First create the auth user
@@ -38,15 +46,17 @@ export async function createEmployee(data: CreateEmployeeData) {
     if (!authData.user) throw new Error('Failed to create auth user');
 
     // Then create the employee record
+    const employeeData: EmployeeInsert = {
+      id: authData.user.id,
+      full_name: data.fullName,
+      email: data.email,
+      role: data.role,
+      employee_code: data.employee_code
+    };
+
     const { data: employee, error: employeeError } = await supabase
       .from('employees')
-      .insert([{
-        id: authData.user.id,
-        full_name: data.fullName,
-        email: data.email,
-        role: data.role,
-        employee_code: data.employee_code
-      }])
+      .insert([employeeData])
       .select()
       .single();
 
