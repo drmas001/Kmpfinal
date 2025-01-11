@@ -5,10 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "CI=false DISABLE_ESLINT_PLUGIN=true tsc --noEmit --skipLibCheck && vite build",
+    "build": "CI=false DISABLE_ESLINT_PLUGIN=true VITE_CJS_IGNORE_WARNING=true tsc --noEmit --skipLibCheck && vite build --emptyOutDir",
     "lint": "eslint .",
     "preview": "vite preview",
-    "generate-types": "npx supabase gen types typescript --project-id drtslrzpunruzhrhzvef > src/types/supabase.ts"
+    "generate-types": "npx supabase gen types typescript --project-id drtslrzpunruzhrhzvef > src/types/supabase.ts",
+    "postinstall": "npm run generate-types"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
