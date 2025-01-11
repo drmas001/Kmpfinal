@@ -40,13 +40,13 @@ export async function createEmployee(data: CreateEmployeeData) {
     // Then create the employee record
     const { data: employee, error: employeeError } = await supabase
       .from('employees')
-      .insert({
+      .insert([{
         id: authData.user.id,
         full_name: data.fullName,
         email: data.email,
         role: data.role,
         employee_code: data.employee_code
-      })
+      }])
       .select()
       .single();
 
