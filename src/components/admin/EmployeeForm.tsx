@@ -32,7 +32,7 @@ export function EmployeeForm({ onSubmit }: EmployeeFormProps) {
       fullName: '',
       email: '',
       password: '',
-      role: undefined,
+      role: undefined
     },
   });
 

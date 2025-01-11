@@ -7,7 +7,6 @@ export interface Employee {
   role: EmployeeRole;
   createdAt: string;
   lastActive?: string;
-  employee_code: string;
 }
 
 export interface CreateEmployeeData {

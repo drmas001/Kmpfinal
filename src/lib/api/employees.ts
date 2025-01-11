@@ -7,7 +7,6 @@ interface DatabaseEmployee {
   full_name: string;
   email: string;
   role: EmployeeRole;
-  employee_code: string;
   created_at?: string;
   last_active?: string;
 }
@@ -53,8 +52,7 @@ export async function createEmployee(employeeData: CreateEmployeeData) {
       id: authData.user.id,
       full_name: employeeData.fullName,
       email: employeeData.email,
-      role: employeeData.role,
-      employee_code: employeeData.employee_code
+      role: employeeData.role
     };
 
     const { data: employee, error: employeeError } = await supabase
@@ -84,7 +82,6 @@ function transformEmployeeData(data: DatabaseEmployee): Employee {
     email: data.email,
     role: data.role,
     createdAt: data.created_at || new Date().toISOString(),
-    lastActive: data.last_active,
-    employee_code: data.employee_code
+    lastActive: data.last_active
   };
 }
