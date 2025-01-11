@@ -1,5 +1,16 @@
 import { supabase, supabaseAdmin } from '@/lib/supabase';
-import type { Employee, CreateEmployeeData } from '@/types/employee';
+import type { Employee, CreateEmployeeData, EmployeeRole } from '@/types/employee';
+
+// Type for the database insert
+interface DatabaseEmployee {
+  id: string;
+  full_name: string;
+  email: string;
+  role: EmployeeRole;
+  employee_code: string;
+  created_at?: string;
+  last_active?: string;
+}
 
 export async function getEmployees() {
   const { data: employees, error } = await supabase
@@ -25,14 +36,6 @@ export async function deleteEmployee(id: string) {
   if (error) throw error;
 }
 
-interface EmployeeInsert {
-  id: string;
-  full_name: string;
-  email: string;
-  role: string;
-  employee_code: string;
-}
-
 export async function createEmployee(data: CreateEmployeeData) {
   try {
     // First create the auth user
@@ -46,7 +49,7 @@ export async function createEmployee(data: CreateEmployeeData) {
     if (!authData.user) throw new Error('Failed to create auth user');
 
     // Then create the employee record
-    const employeeData: EmployeeInsert = {
+    const employeeData: DatabaseEmployee = {
       id: authData.user.id,
       full_name: data.fullName,
       email: data.email,
@@ -74,13 +77,13 @@ export async function createEmployee(data: CreateEmployeeData) {
 }
 
 // Helper function to transform database employee data to match the Employee type
-function transformEmployeeData(data: any): Employee {
+function transformEmployeeData(data: DatabaseEmployee): Employee {
   return {
     id: data.id,
     fullName: data.full_name,
     email: data.email,
     role: data.role,
-    createdAt: data.created_at,
+    createdAt: data.created_at || new Date().toISOString(),
     lastActive: data.last_active,
     employee_code: data.employee_code
   };
