@@ -8,8 +8,7 @@
     "build": "CI=false DISABLE_ESLINT_PLUGIN=true VITE_CJS_IGNORE_WARNING=true tsc --noEmit --skipLibCheck && vite build --emptyOutDir",
     "lint": "eslint .",
     "preview": "vite preview",
-    "generate-types": "npx supabase gen types typescript --project-id drtslrzpunruzhrhzvef > src/types/supabase.ts",
-    "postinstall": "[ \"$SKIP_GENERATE_TYPES\" = \"true\" ] || npm run generate-types"
+    "db:migrate": "node scripts/migrate.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
@@ -41,15 +40,17 @@
     "@radix-ui/react-toggle": "^1.1.0",
     "@radix-ui/react-toggle-group": "^1.1.0",
     "@radix-ui/react-tooltip": "^1.1.2",
-    "@supabase/supabase-js": "^2.47.12",
+    "better-sqlite3": "^9.6.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "cmdk": "^1.0.0",
     "date-fns": "^3.6.0",
     "embla-carousel-react": "^8.3.0",
     "input-otp": "^1.2.4",
+    "jose": "^5.10.0",
     "jspdf": "^2.5.2",
     "jspdf-autotable": "^3.8.4",
+    "knex": "^3.1.0",
     "lucide-react": "^0.446.0",
     "next-themes": "^0.3.0",
     "react": "^18.2.0",
@@ -60,6 +61,7 @@
     "react-router-dom": "^6.21.0",
     "recharts": "^2.15.0",
     "sonner": "^1.5.0",
+    "sqlite3": "^5.1.7",
     "tailwind-merge": "^2.5.2",
     "tailwindcss-animate": "^1.0.7",
     "vaul": "^1.0.0",
@@ -68,6 +70,7 @@
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.4.2",
+    "@types/better-sqlite3": "^7.6.9",
     "@types/jest": "^29.5.12",
     "@types/node": "^20.11.30",
     "@types/react": "^18.2.67",
@@ -79,7 +82,6 @@
     "eslint-plugin-react-refresh": "^0.4.6",
     "jest": "^29.7.0",
     "postcss": "^8.4.38",
-    "supabase": "^1.148.6",
     "tailwindcss": "^3.4.1",
     "typescript": "^5.4.2",
     "vite": "^5.1.6"
